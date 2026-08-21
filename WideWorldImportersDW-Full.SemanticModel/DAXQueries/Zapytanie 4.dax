@@ -1,0 +1,18 @@
+DEFINE
+	VAR __DS0Core = 
+		SUMMARIZECOLUMNS(
+			ROLLUPADDISSUBTOTAL('Dim_StockItem'[Stock Item], "IsGrandTotalRowTotal"),
+			"Margin__", '_Measures'[Margin %],
+			"Total_Revenue", '_Measures'[Total Revenue],
+			"Total_Quantity", '_Measures'[Total Quantity],
+			"Avg_Unit_Price", '_Measures'[Avg Unit Price]
+		)
+
+	VAR __DS0PrimaryWindowed = 
+		TOPN(502, __DS0Core, [IsGrandTotalRowTotal], 0, [Margin__], 0, 'Dim_StockItem'[Stock Item], 1)
+
+EVALUATE
+	__DS0PrimaryWindowed
+
+ORDER BY
+	[IsGrandTotalRowTotal] DESC, [Margin__] DESC, 'Dim_StockItem'[Stock Item]

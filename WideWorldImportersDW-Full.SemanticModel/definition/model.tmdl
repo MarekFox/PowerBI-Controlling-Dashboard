@@ -1,0 +1,27 @@
+model Model
+	culture: pl-PL
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pl-PL
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Dim_City","Dim_Customer","Dim_Date","Dim_Employee","Dim_StockItem","Fact_Sales","_Measures"]
+
+annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
+
+ref table Dim_City
+ref table DateTableTemplate_04331c5b-f66b-4178-92b8-8dd6e74525a5
+ref table Dim_Customer
+ref table Dim_Date
+ref table LocalDateTable_8ab17c1d-fe10-47ea-85fd-78ef68bac329
+ref table Dim_Employee
+ref table Dim_StockItem
+ref table Fact_Sales
+ref table _Measures
+
+ref cultureInfo pl-PL
+

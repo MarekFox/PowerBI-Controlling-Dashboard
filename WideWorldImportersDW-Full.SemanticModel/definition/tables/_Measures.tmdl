@@ -1,0 +1,103 @@
+table _Measures
+	lineageTag: 098723d7-ae08-43f0-b19d-04900e30ebc8
+
+	measure 'Total Revenue' =
+			
+			SUM(Fact_Sales[Total Excluding Tax])
+		lineageTag: e15100c5-ed27-4e08-855c-ece5c9e53ccf
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Profit' = SUM(Fact_Sales[Profit])
+		lineageTag: dffe1010-0228-48d2-b306-bfc1bd2070e1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total COGS' = [Total Revenue] - [Total Profit]
+		lineageTag: db18dcea-e14f-4b70-a881-ace4f1f139ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Margin %' = DIVIDE([Total Profit], [Total Revenue], 0)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 2ca0f37a-da8b-4e4a-b9b0-00c4d2435a0d
+
+	measure 'Sales YTD' =
+			
+			TOTALYTD([Total Revenue], Dim_Date[Date])
+		lineageTag: 8505db68-cf5b-42b7-adeb-24a988a85ba1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales PY' = ```
+			
+			CALCULATE(
+			    [Total Revenue], 
+			    SAMEPERIODLASTYEAR(Dim_Date[Date])
+			)
+			```
+		lineageTag: 1c38361a-6f63-400f-bba7-080b1ba66a57
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales YoY Growth' =
+			
+			[Total Revenue] - [Sales PY]
+		lineageTag: bc6f5327-747a-4767-a877-edd2bfc5bf93
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales YoY %' =
+			
+			DIVIDE([Sales YoY Growth], [Sales PY], 0)
+		lineageTag: 65b283b8-650b-4303-9a0f-263e96e010f3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Quantity' =
+			
+			SUM(Fact_Sales[Quantity])
+		formatString: 0
+		lineageTag: 43bf9c4d-96e9-44c2-860c-c196aadf7bc9
+
+	measure 'Avg Unit Price' =
+			
+			DIVIDE([Total Revenue], [Total Quantity], 0)
+		lineageTag: f5359d02-af94-4e79-ab1a-d6eb0ac10e3e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Unit Cost' =
+			
+			DIVIDE([Total COGS], [Total Quantity], 0)
+		lineageTag: 48f4d335-6836-49a6-a21b-6f2732cb6a3b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Invoices' =
+			
+			DISTINCTCOUNT(Fact_Sales[WWI Invoice ID])
+		lineageTag: be923dfe-42f8-4e85-928c-fe4e3d07d05c
+
+	measure 'Revenue by Delivery Date' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    USERELATIONSHIP(Fact_Sales[Delivery Date Key], Dim_Date[Date])
+			)
+		lineageTag: d0e2fb3f-cb8c-4771-9547-3c2fa8374e2a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Źródło = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Kolumna 1" = _t]),
+				    #"Zmieniono typ" = Table.TransformColumnTypes(Źródło,{{"Kolumna 1", type text}}),
+				    #"Usunięto kolumny" = Table.RemoveColumns(#"Zmieniono typ",{"Kolumna 1"})
+				in
+				    #"Usunięto kolumny"
+
+	annotation PBI_ResultType = Table
+

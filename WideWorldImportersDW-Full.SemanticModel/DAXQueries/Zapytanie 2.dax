@@ -1,0 +1,4 @@
+EVALUATE
+	ROW(
+	"Total_Invoices", '_Measures'[Total Invoices]
+)

@@ -1,0 +1,74 @@
+table Dim_Customer
+	lineageTag: 5fb2c837-ab77-49f5-a02b-278367d66e76
+
+	column 'Customer Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 23c59e43-7e94-4397-a8a5-b2019c268452
+		summarizeBy: none
+		sourceColumn: Customer Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer
+		dataType: string
+		lineageTag: 25f61582-b042-488c-8dc5-e0b1bd1b5aaa
+		summarizeBy: none
+		sourceColumn: Customer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bill To Customer'
+		dataType: string
+		lineageTag: 16229346-47a5-4006-bde0-42360174fdd9
+		summarizeBy: none
+		sourceColumn: Bill To Customer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 7df6eabe-6898-4d8f-83d2-0d5f01ff9644
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Buying Group'
+		dataType: string
+		lineageTag: 8a9d5779-bc84-4745-b1f2-3ce096f0a939
+		summarizeBy: none
+		sourceColumn: Buying Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Primary Contact'
+		dataType: string
+		lineageTag: 4a7dc8d2-8efd-4a20-8743-db61b168463f
+		summarizeBy: none
+		sourceColumn: Primary Contact
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Postal Code'
+		dataType: string
+		lineageTag: 1619f2a1-8f9a-4ca7-af6c-04e26e6d62cb
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customer = m
+		mode: import
+		source =
+				let
+				    Źródło = Sql.Database(".", "WideWorldImportersDW"),
+				    Dimension_Customer = Źródło{[Schema="Dimension",Item="Customer"]}[Data],
+				    #"Usunięto kolumny" = Table.RemoveColumns(Dimension_Customer,{"WWI Customer ID", "Lineage Key", "Valid From", "Valid To"})
+				in
+				    #"Usunięto kolumny"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

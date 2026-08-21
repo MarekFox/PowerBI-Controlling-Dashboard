@@ -1,0 +1,49 @@
+relationship 1c83bbe3-6999-416d-8b89-40d8d2c98426
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Date.Date
+	toColumn: LocalDateTable_8ab17c1d-fe10-47ea-85fd-78ef68bac329.Date
+
+relationship bb1b32a4-5d15-4000-9030-ef2323cae59c
+	fromColumn: Fact_Sales.'City Key'
+	toColumn: Dim_City.'City Key'
+
+	annotation PBI_IsFromSource = FS
+
+relationship f52ca6a0-7792-45af-b515-9b730057398e
+	fromColumn: Fact_Sales.'Bill To Customer Key'
+	toColumn: Dim_Customer.'Customer Key'
+
+	annotation PBI_IsFromSource = FS
+
+relationship 1fdd8f94-0ea1-4eda-9969-d5c6c005c623
+	isActive: false
+	fromColumn: Fact_Sales.'Customer Key'
+	toColumn: Dim_Customer.'Customer Key'
+
+	annotation PBI_IsFromSource = FS
+
+relationship e65be267-f5aa-4a06-b180-2284dcc73109
+	fromColumn: Fact_Sales.'Delivery Date Key'
+	toColumn: Dim_Date.Date
+
+	annotation PBI_IsFromSource = FS
+
+relationship 6c332b9a-bd2e-4cb7-abcc-9291d7c04e1b
+	isActive: false
+	fromColumn: Fact_Sales.'Invoice Date Key'
+	toColumn: Dim_Date.Date
+
+	annotation PBI_IsFromSource = FS
+
+relationship 5dfc7f2d-60b2-4109-bb14-cc8432957221
+	fromColumn: Fact_Sales.'Salesperson Key'
+	toColumn: Dim_Employee.'Employee Key'
+
+	annotation PBI_IsFromSource = FS
+
+relationship c421e5b6-4bd9-4eaf-aee1-a83068d26da9
+	fromColumn: Fact_Sales.'Stock Item Key'
+	toColumn: Dim_StockItem.'Stock Item Key'
+
+	annotation PBI_IsFromSource = FS
+

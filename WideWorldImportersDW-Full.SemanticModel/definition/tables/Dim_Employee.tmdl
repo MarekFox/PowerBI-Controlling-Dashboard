@@ -1,0 +1,51 @@
+table Dim_Employee
+	lineageTag: f37dd8b3-26dd-4f67-9da5-053396175c38
+
+	column 'Employee Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1d0b5901-8070-4088-b0d8-5d296ee70bba
+		summarizeBy: none
+		sourceColumn: Employee Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee
+		dataType: string
+		lineageTag: 21213db4-1d39-4689-85de-36b5f69c5d2f
+		summarizeBy: none
+		sourceColumn: Employee
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Preferred Name'
+		dataType: string
+		lineageTag: 5708efd1-9019-41f3-ac29-d53b565e6559
+		summarizeBy: none
+		sourceColumn: Preferred Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Salesperson'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: bfb7d448-2de3-4667-ac5e-d2086064c2eb
+		summarizeBy: none
+		sourceColumn: Is Salesperson
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Employee = m
+		mode: import
+		source =
+				let
+				    Źródło = Sql.Database(".", "WideWorldImportersDW"),
+				    Dimension_Employee = Źródło{[Schema="Dimension",Item="Employee"]}[Data],
+				    #"Usunięto kolumny" = Table.RemoveColumns(Dimension_Employee,{"WWI Employee ID", "Lineage Key", "Valid From", "Valid To"})
+				in
+				    #"Usunięto kolumny"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

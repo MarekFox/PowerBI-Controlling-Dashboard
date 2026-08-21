@@ -1,0 +1,21 @@
+# Power BI binary data files
+*.pbix
+
+# Power BI Project (PBIP) local user settings and cache
+**/.pbi/
+*.cache.abf
+*.User
+
+# Power BI temporary files
+*.tmp
+*.log
+*.User
+*.AutoSave*
+~*
+
+# Custom ignored directories
+Other/
+
+# System files
+Thumbs.db
+.DS_Store

@@ -1,0 +1,149 @@
+table Dim_StockItem
+	lineageTag: f1d2ff1b-5619-42a8-8bdb-3eb1c1cca641
+
+	column 'Stock Item Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: ef28a8ee-ee9a-4791-baeb-4348bab96053
+		summarizeBy: none
+		sourceColumn: Stock Item Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stock Item'
+		dataType: string
+		lineageTag: f2b3b4ba-6973-4993-96db-8ec3e5a2ef6a
+		summarizeBy: none
+		sourceColumn: Stock Item
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color
+		dataType: string
+		lineageTag: e692eec4-a1d2-40ae-9872-e76cd7ebd914
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Selling Package'
+		dataType: string
+		lineageTag: ea9210ab-ac94-43b6-89cb-04c12e0383cc
+		summarizeBy: none
+		sourceColumn: Selling Package
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Buying Package'
+		dataType: string
+		lineageTag: c6e05fb4-53c6-4a83-b610-c1e79a816006
+		summarizeBy: none
+		sourceColumn: Buying Package
+
+		annotation SummarizationSetBy = Automatic
+
+	column Brand
+		dataType: string
+		lineageTag: 04f76a47-2251-4ae5-8a5f-441e60a4a4b9
+		summarizeBy: none
+		sourceColumn: Brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column Size
+		dataType: string
+		lineageTag: 945f85c9-4c6a-48b2-97f0-8605ab83a4cc
+		summarizeBy: none
+		sourceColumn: Size
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Lead Time Days'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2b508793-6a4b-4dbd-bc06-855af108d7d1
+		summarizeBy: sum
+		sourceColumn: Lead Time Days
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Quantity Per Outer'
+		dataType: int64
+		formatString: 0
+		lineageTag: 193ee462-cdac-42a3-880f-4ae98662c7c6
+		summarizeBy: sum
+		sourceColumn: Quantity Per Outer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Chiller Stock'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 6cf654b5-9af3-4664-a036-ef2e1f0f4f85
+		summarizeBy: none
+		sourceColumn: Is Chiller Stock
+
+		annotation SummarizationSetBy = Automatic
+
+	column Barcode
+		dataType: string
+		lineageTag: 64cab6ac-75fa-44c4-af0c-1f18f4b9026c
+		summarizeBy: none
+		sourceColumn: Barcode
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tax Rate'
+		dataType: double
+		lineageTag: 24d3cbf4-8571-411b-9e07-df3e449a05d5
+		summarizeBy: sum
+		sourceColumn: Tax Rate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Unit Price'
+		dataType: double
+		lineageTag: d5c3c499-781a-46b2-8842-fe03e3ba33b5
+		summarizeBy: sum
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Recommended Retail Price'
+		dataType: double
+		lineageTag: 22c5d233-d849-442b-8842-fa8574472bfb
+		summarizeBy: sum
+		sourceColumn: Recommended Retail Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Typical Weight Per Unit'
+		dataType: double
+		lineageTag: 966ce978-6212-44d9-98d5-6404012118c3
+		summarizeBy: sum
+		sourceColumn: Typical Weight Per Unit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Dim_StockItem = m
+		mode: import
+		source =
+				let
+				    Źródło = Sql.Database(".", "WideWorldImportersDW"),
+				    #"Dimension_Stock Item" = Źródło{[Schema="Dimension",Item="Stock Item"]}[Data],
+				    #"Usunięto kolumny" = Table.RemoveColumns(#"Dimension_Stock Item",{"WWI Stock Item ID", "Lineage Key", "Valid From", "Valid To"})
+				in
+				    #"Usunięto kolumny"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

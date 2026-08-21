@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "da5d218c555123cda020",
+  "displayName": "\t\tControlling Sprzedaży",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "pageBinding": {
+    "name": "aa18b7ca0c6db572da3b",
+    "type": "Default",
+    "parameters": []
+  }
+}

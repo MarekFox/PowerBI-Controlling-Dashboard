@@ -1,0 +1,99 @@
+table Dim_City
+	lineageTag: ccfa0eb5-34ca-4bf3-8854-5c5d67bcb2f0
+
+	column 'City Key'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f7bb231-1908-4f61-a5a5-c1e49f35aef1
+		summarizeBy: none
+		sourceColumn: City Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 82e701ea-06f9-424e-b8aa-7a233882f99a
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'State Province'
+		dataType: string
+		lineageTag: e77ede4d-0209-40c2-a8fe-e15b110e6908
+		summarizeBy: none
+		sourceColumn: State Province
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 97ee39d0-f5a2-434e-802d-2d18de3fb8dc
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Continent
+		dataType: string
+		lineageTag: 549db820-a882-456e-8c9c-ad62a9673bba
+		summarizeBy: none
+		sourceColumn: Continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sales Territory'
+		dataType: string
+		lineageTag: 7c91ad85-bc07-4aec-9092-fa1183ab94f9
+		summarizeBy: none
+		sourceColumn: Sales Territory
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 7ad97790-b712-456f-a884-1ea1826764e8
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subregion
+		dataType: string
+		lineageTag: 6dbe7a41-9593-428b-8aa7-c53cab8d18ed
+		summarizeBy: none
+		sourceColumn: Subregion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location
+		dataType: string
+		lineageTag: 18bcd958-151a-42d8-bd96-20c6641ee6c2
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Latest Recorded Population'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0d2c55e0-9e31-4368-8c16-433293cf0ad7
+		summarizeBy: sum
+		sourceColumn: Latest Recorded Population
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_City = m
+		mode: import
+		source =
+				let
+				    Źródło = Sql.Database(".", "WideWorldImportersDW"),
+				    Dimension_City = Źródło{[Schema="Dimension",Item="City"]}[Data],
+				    #"Usunięto kolumny Lineage i WWI City ID" = Table.RemoveColumns(Dimension_City,{"WWI City ID", "Lineage Key", "Valid From", "Valid To"})
+				in
+				    #"Usunięto kolumny Lineage i WWI City ID"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

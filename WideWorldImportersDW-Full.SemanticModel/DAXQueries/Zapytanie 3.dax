@@ -1,0 +1,7 @@
+EVALUATE
+	ROW(
+		"Total_Revenue", '_Measures'[Total Revenue],
+		"Total_Profit", '_Measures'[Total Profit],
+		"Margin__", '_Measures'[Margin %],
+		"Total_Invoices", '_Measures'[Total Invoices]
+	)

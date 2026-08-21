@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainerMobileState/2.6.0/schema.json",
+  "position": {
+    "x": 1,
+    "y": 577,
+    "z": 7,
+    "height": 364,
+    "width": 323
+  },
+  "objects": {
+    "layout": [
+      {
+        "properties": {
+          "orientation": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          },
+          "columnCount": {
+            "expr": {
+              "Literal": {
+                "Value": "1L"
+              }
+            }
+          },
+          "rowCount": {
+            "expr": {
+              "Literal": {
+                "Value": "5L"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "cardImage": [],
+    "shapeCustomRectangle": [
+      {
+        "properties": {
+          "rectangleRoundedCurve": {
+            "expr": {
+              "Literal": {
+                "Value": "4L"
+              }
+            }
+          }
+        },
+        "selector": {
+          "id": "default"
+        }
+      }
+    ]
+  }
+}
