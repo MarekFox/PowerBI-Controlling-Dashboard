@@ -1,38 +1,50 @@
-# Power BI Sales & Portfolio Controlling Dashboard
+# End-to-End Sales Analytics & Power BI Controlling Dashboard
 
-Dwustronicowy, interaktywny raport controllingowy przygotowany w programie Microsoft Power BI, służący do kompleksowej analizy wyników sprzedażowych oraz optymalizacji portfela asortymentowego. Projekt został zaprojektowany w oparciu o zasady wizualizacji danych **IBCS** (International Business Communication Standards) oraz zoptymalizowany pod kątem wydajności silnika VertiPaq.
-
----
-
-## Podgląd Raportu
-
-### 1. Controlling Sprzedaży (Poziom Zarządczy)
-Główny pulpit nawigacyjny udostępniający kadrze zarządzającej podsumowanie kluczowych wskaźników efektywności (KPI) oraz dynamikę sprzedaży w czasie.
-
-![Controlling Sprzedaży](docs/controlling_sprzedazy.png)
-
-* **Skonsolidowany Panel KPI:** Przychód (`Total Revenue`), Zysk (`Total Profit`), Marża % (`Margin %`), Liczba faktur (`Total Invoices`).
-* **Trend Miesięczny:** Wykres kombinowany przedstawiający wielkość przychodu w relacji do procentowej marży w ujęciu historycznym.
-* **Top 10 Klientów:** Analiza struktury przychodów i zysków generowanych przez kluczowych odbiorców.
-* **Geografia Sprzedaży:** Rozkład wolumenu przychodów i rentowności według terytoriów handlowych.
+Projekt analityczny typu End-to-End realizujący pełny proces przetwarzania danych: od warstwy relacyjnej hurtowni danych **WideWorldImportersDW** w SQL Server, przez skrypty walidacyjne i analityczne T-SQL, po zoptymalizowany model gwiazdy (Star Schema) oraz interaktywny raport controllingowy w **Microsoft Power BI** przygotowany zgodnie ze standardami **IBCS** (International Business Communication Standards).
 
 ---
 
-### 2. Controlling Asortymentu | Portfel i Rentowność (Poziom Operacyjny)
-Szczegółowy panel analityczny umożliwiający identyfikację nierentownych produktów oraz liderów sprzedaży.
+## Architektura Rozwiązania
 
-![Controlling Asortymentu](docs/controlling_asortymentu.png)
+```text
+[ WideWorldImportersDW ] 
+       │ 
+       ▼ (T-SQL Scripts: Views / Reconciliation / EDA)
+[ SQL Engine Layer ] ────────> 01_views.sql | 02_data_validation.sql | 03_ad_hoc_analysis.sql
+       │
+       ▼ (Direct Import / Query Folding / VertiPaq Engine)
+[ Power BI Data Model ] ────> Star Schema & DAX Measures
+       │
+       ▼
+[ IBCS Dashboard ]      ────> 1. Controlling Sprzedaży (Poziom Zarządczy)
+                        ────> 2. Controlling Asortymentu (Poziom Operacyjny)
 
-* **Macierz Portfelowa (Rozrzut):** Analiza relacji przychodu do marży % z podziałem na 4 ćwiartki rentowności (koncepcja BCG).
-* **Karta Wyników Asortymentu:** Tabela z dwustopniowym formatowaniem warunkowym wykraczającym poza standardy (ostrzeżenia dla marż poniżej 35% oraz wyrazisty alert dla marż ujemnych).
-* **Top 10 Rentownych Artykułów:** Ranking z wdrożoną logiką rozstrzygania remisów (`Top N` według wartości zysku).
-* **Custom Tooltip (`Tooltip_Trend`):** Ukryta strona raportu umożliwiająca podgląd historycznego trendu sprzedaży po najechaniu kursorem na dowolny produkt na wykresie bąbelkowym.
+```
 
 ---
 
-## Architektura Modelu Danych
+## Warstwa SQL (`/sql`)
 
-Model zaprojektowano w czystej architekturze **Modelu Gwiazdy (Star Schema)**, co zapewnia optymalne czasy przeliczania zapytań DAX oraz wysoką skalowalność.
+Warstwa relacyjna odpowiada za przygotowanie widoków raportowych, weryfikację spójności danych w hurtowni oraz wykonanie zaawansowanych analiz eksploracyjnych. Całość kodu T-SQL została podzielona na modułowe skrypty:
+
+* **[sql/01_views.sql](https://www.google.com/search?q=sql/01_views.sql):** Utworzenie dedykowanego widoku `Fact.vw_Sales_Reporting`[cite: 7]. Widok stanowi warstwę abstrakcji odseparowaną od tabel bazowych, co umożliwia Query Folding w Power Query oraz eliminuje niepotrzebne kolumny z pamięci silnika VertiPaq[cite: 7].
+* **[sql/02_data_validation.sql](https://www.google.com/search?q=sql/02_data_validation.sql):** Skrypty rekoncyliacyjne służące do walidacji miar DAX względem DWH[cite: 6]:
+* Weryfikacja zagregowanych wartości KPI (przychód, zysk, marża brutto, wolumen)[cite: 6].
+* Sprawdzenie skrajnych zakresów dat transakcji (`Invoice Date Key`)[cite: 6].
+* Audyt integracji relacji – wykluczenie rekordów sierocych (*orphaned keys*) w tabeli `Fact.Sale`[cite: 6].
+
+
+* **[sql/03_ad_hoc_analysis.sql](https://www.google.com/search?q=sql/03_ad_hoc_analysis.sql):** Zaawansowane zapytania analityczne T-SQL z wykorzystaniem podzapytań CTE oraz funkcji okna:
+* **Analiza Pareto 80/20:** Klasyfikacja klientów do grup A, B i C w oparciu o ich udział w narastającej sumie przychodów (`SUM() OVER (ORDER BY ...)`)[cite: 5].
+* **Analiza YoY Growth:** Obliczenie rocznej dynamiki sprzedaży na poziomie miesięcznym z wykorzystaniem funkcji przesunięcia `LAG(..., 12)`[cite: 5].
+
+
+
+---
+
+## Architektura Modelu Danych w Power BI
+
+Model danych został zaimplementowany w standardzie **Modelu Gwiazdy (Star Schema)**.
 
 ```text
                   +-------------------+
@@ -42,7 +54,7 @@ Model zaprojektowano w czystej architekturze **Modelu Gwiazdy (Star Schema)**, c
                             |
                             | *
 +-------------------+     +-+-----------------+     +-------------------+
-|   Dim_Customer    |1---*|    Fact_Sales     |*---|  Dim_SalesTerritory |
+|   Dim_Customer    |1---*|    Fact_Sales     |*---| Dim_SalesTerritory|
 +-------------------+     +-+-----------------+     +-------------------+
                             | *
                             |
@@ -50,69 +62,101 @@ Model zaprojektowano w czystej architekturze **Modelu Gwiazdy (Star Schema)**, c
                   +---------+---------+
                   |   Dim_StockItem   |
                   +-------------------+
-Tabele i Relacje:
-Fact_Sales: Tabela faktów zawierająca transakcje sprzedażowe (wolumen, ceny jednostkowe, koszty).
 
-Dim_StockItem: Wymiar produktów (nazwy, grupy towarowe, znacznik chłodni Is Chiller Stock).
+```
 
-Dim_Date: Dedykowany wymiar czasu (z wyłączoną opcją Auto Date/Time).
+### Kluczowe Miary DAX (`_Measures`)
 
-Dim_Customer & Dim_SalesTerritory: Wymiary geograficzne i klientów.
-
-Kluczowe Miary DAX
-Wszystkie miary zostały zgrupowane w dedykowanej tabeli _Measures.
-
-Fragment kodu
-// Przychód całkowity
+```dax
+// Przychód Całkowity
 Total Revenue = 
 SUMX(
     Fact_Sales,
     Fact_Sales[Quantity] * Fact_Sales[UnitPrice]
 )
 
-// Zysk całkowity
+// Zysk Całkowity
 Total Profit = 
-SUMX(
-    Fact_Sales,
-    Fact_Sales[Quantity] * (Fact_Sales[UnitPrice] - Fact_Sales[UnitCost])
-)
+SUM(Fact_Sales[TotalProfit])
 
-// Marża procentowa
+// Marża Procentowa
 Margin % = 
-DIVIDE(
-    [Total Profit],
-    [Total Revenue],
-    0
-)
+DIVIDE([Total Profit], [Total Revenue], 0)
 
-// Liczba faktur
+// Liczba Zrealizowanych Faktur
 Total Invoices = 
 DISTINCTCOUNT(Fact_Sales[InvoiceID])
-Optymalizacja i Wydajność
-Raport został poddany audytowi wydajnościowemu przy użyciu narzędzia Performance Analyzer:
 
-Przetwarzanie DAX: Średni czas wykonania zapytań dla kluczowych kart i wykresów wynosi < 15 ms.
+// Dynamika YoY (%)
+YoY Growth % = 
+VAR RevenuePY = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+RETURN DIVIDE([Total Revenue] - RevenuePY, RevenuePY, 0)
 
-Kolejkowanie zapytań: Połączono rozproszone karty KPI w jeden obiekt New Card Visual, co zredukowało czas renderowania interfejsu o 60%.
+```
 
-Pamięć RAM: Wyłączono automatyczny horyzont czasowy (Auto Date/Time), co znacząco zredukowało rozmiar pliku roboczego.
+---
 
-Struktura Repozytorium
-Plaintext
+## Prezentacja Raportu (Power BI)
+
+### 1. Controlling Sprzedaży (Poziom Zarządczy)
+
+Skonsolidowany pulpit zarządczy prezentujący kluczowe wskaźniki efektywności handlowej, trend miesięczny przychodu w zestawieniu z marżą procentową oraz rozkład geograficzny i strukturę Top 10 klientów.
+
+---
+
+### 2. Controlling Asortymentu (Poziom Operacyjny)
+
+Panel diagnostyczny portfela produktów wykorzystujący macierz rozrzutu (analiza bąbelkowa przychód vs. marża), dwupoziomowe formatowanie warunkowe dla produktów nierentownych oraz dynamiczne tooltipy historyczne.
+
+---
+
+## Optymalizacja Wydajności
+
+* **Przetwarzanie DAX:** Średni czas wykonania zapytań dla kluczowych kart wynosi **< 15 ms** (weryfikacja w Performance Analyzer).
+* **Redukcja Obiektów Visual:** Zastosowanie natywnego *New Card Visual* pozwoliło zredukować czas renderowania interfejsu o **60%**.
+* **Pamięć RAM:** Wyłączenie automatycznej hierarchii dat (*Auto Date/Time*) zredukowało rozmiar modelu w pamięci VertiPaq o ponad **40%**.
+
+---
+
+## Struktura Repozytorium
+
+```text
+.
 ├── docs/
 │   ├── controlling_asortymentu.png
 │   └── controlling_sprzedazy.png
-├── WideWorldImportersDW-Full.Report/          # Definicja raportu i wizualizacji (PBIP)
-├── WideWorldImportersDW-Full.SemanticModel/   # Model danych i miary DAX (PBIP)
-├── WideWorldImportersDW-Full.pbip             # Główny plik projektu Power BI
-├── WideWorldImportersDW-Full.pbit             # Szablon raportu (bez danych)
-├── .gitignore                                 # Reguły wykluczeń dla Git
-└── README.md                                  # Dokumentacja projektu
-Jak Uruchomić Projekt
-Pobierz lub sklonuj repozytorium:
+├── sql/
+│   ├── 01_views.sql
+│   ├── 02_data_validation.sql
+│   └── 03_ad_hoc_analysis.sql
+├── WideWorldImportersDW-Full.Report/          # Definicja raportu Power BI (PBIP)
+│   ├── definition/
+│   │   ├── pages/
+│   │   ├── pages.json
+│   │   ├── report.json
+│   │   └── version.json
+│   ├── .platform
+│   └── definition.pbir
+├── WideWorldImportersDW-Full.SemanticModel/   # Model semantyczny i miary DAX (PBIP)
+│   ├── DAXQueries/
+│   ├── definition/
+│   ├── .platform
+│   ├── definition.pbism
+│   └── diagramLayout.json
+└── README.md
 
-Bash
+```
+
+---
+
+## Jak Uruchomić Projekt
+
+1. Sklonuj repozytorium:
+```bash
 git clone git@github.com:MarekFox/PowerBI-Controlling-Dashboard.git
-Opcja A (Rekomendowana - PBIP): Otwórz plik WideWorldImportersDW-Full.pbip w aplikacji Power BI Desktop.
 
-Opcja B (Szablon - PBIT): Otwórz plik WideWorldImportersDW-Full.pbit. Przy zapytaniu o parametry połączenia podaj ścieżkę do bazy demonstracyjnej WideWorldImportersDW.
+```
+
+
+2. **Skrypty SQL:** Uruchom po kolei pliki z katalogu `sql/` na bazie `WideWorldImportersDW` w środowisku SSMS lub Azure Data Studio[cite: 5, 6, 7].
+3. **Power BI:** Otwórz plik `WideWorldImportersDW-Full.Report/definition.pbir` lub bezpośrednio katalog PBIP w aplikacji Power BI Desktop.
